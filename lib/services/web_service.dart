@@ -1,0 +1,40 @@
+import 'package:dio/dio.dart';
+import 'package:news/models/news_article.dart';
+import 'package:news/utils/constants.dart';
+
+class WebService {
+  var dio = new Dio();
+
+  Future<List<NewsArticle>> fetchHeadlinesByCountry(String country) async {
+    final response = await dio.get(Constants.headlinesFor(country));
+
+    if (response.statusCode == 200) {
+      final result = response.data;
+      Iterable list = result['articles'];
+      return list.map((article) => NewsArticle.fromJson(article)).toList();
+    } else {
+      throw Exception("Failed to get head news");
+    }
+  }
+
+
+  Future<List<NewsArticle>> fetchTopHeadlines() async {
+    String url = Constants.TOP_HEADLINES_URL;
+
+    try{
+      final response = await dio.get(url);
+
+      if (response.statusCode == 200) {
+        final result = response.data;
+        Iterable articlesList = result['articles'];
+        return articlesList.map((article) => NewsArticle.fromJson(article)).toList();
+
+      } else {
+        throw Exception("Failed to get head news");
+      }
+    } catch (error){
+      throw Exception(error.toString());
+    }
+
+  }
+}
